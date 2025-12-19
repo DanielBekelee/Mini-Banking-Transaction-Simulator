@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-const protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
+
+  console.log("AUTH HEADER:", req.headers.authorization);
 
   if (
     req.headers.authorization &&
@@ -15,17 +17,13 @@ const protect = async (req, res, next) => {
 
       req.user = await User.findById(decoded.id).select("-password");
 
-      if (!req.user) {
-        return res.status(401).json({ message: "User not found" });
-      }
-
-      next();
+      return next(); // <--- RETURN here
     } catch (error) {
+      console.error("JWT VERIFY ERROR:", error.message);
       return res.status(401).json({ message: "Not authorized, invalid token" });
     }
-  } else {
-    return res.status(401).json({ message: "Not authorized, no token" });
   }
-};
 
-export default protect;
+  // This runs ONLY if token is undefined
+  return res.status(401).json({ message: "Not authorized, no token" });
+};

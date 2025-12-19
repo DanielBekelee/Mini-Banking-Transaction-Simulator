@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js"; // add this line
 import accountRoutes from "./routes/accountRoutes.js";
-
+import transactionRoutes from "./routes/transactionRoutes.js";
 dotenv.config();
 connectDB();
 
@@ -15,7 +15,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes); // attach auth routes
 app.use("/api/accounts", accountRoutes);
-
+app.use("/api/transactions", transactionRoutes);
 // Test route
 app.get("/api/users-with-accounts", async (req, res) => {
   const users = await User.find().populate("bankAccount"); // populate linked account

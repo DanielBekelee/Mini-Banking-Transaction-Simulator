@@ -1,78 +1,71 @@
 import BankAccount from "../models/BankAccount.js";
+import Transaction from "../models/Transaction.js";
 
 // 🔹 Deposit Money
 export const depositMoney = async (req, res) => {
-  try {
-    const { accountNumber, amount } = req.body;
+  const { amount } = req.body;
 
-    if (amount <= 0) {
-      return res.status(400).json({ message: "Amount must be greater than zero" });
-    }
-
-    const account = await BankAccount.findOne({ accountNumber });
-
-    if (!account) {
-      return res.status(404).json({ message: "Account not found" });
-    }
-
-    account.balance += amount;
-
-    account.transactions.push({
-      type: "deposit",
-      amount,
-      description: "Cash deposit",
-    });
-
-    await account.save();
-
-    res.json({
-      message: "Deposit successful",
-      balance: account.balance,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+  if (amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
   }
+
+  const account = await BankAccount.findOne({ user: req.user.id });
+  if (!account) {
+    return res.status(404).json({ message: "Account not found" });
+  }
+
+  account.balance += amount;
+  await account.save();
+
+  await Transaction.create({
+    user: req.user.id,
+    account: account._id,
+    type: "deposit",
+    amount,
+    balanceAfter: account.balance,
+  });
+
+  res.json({
+    message: "Deposit successful",
+    balance: account.balance,
+  });
 };
+
 
 // 🔹 Withdraw Money
 export const withdrawMoney = async (req, res) => {
-  try {
-    const { accountNumber, amount } = req.body;
+  const { amount } = req.body;
 
-    if (amount <= 0) {
-      return res.status(400).json({ message: "Amount must be greater than zero" });
-    }
-
-    const account = await BankAccount.findOne({ accountNumber });
-
-    if (!account) {
-      return res.status(404).json({ message: "Account not found" });
-    }
-
-    if (account.balance < amount) {
-      return res.status(400).json({ message: "Insufficient balance" });
-    }
-
-    account.balance -= amount;
-
-    account.transactions.push({
-      type: "withdraw",
-      amount,
-      description: "Cash withdrawal",
-    });
-
-    await account.save();
-
-    res.json({
-      message: "Withdrawal successful",
-      balance: account.balance,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+  if (amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
   }
+
+  const account = await BankAccount.findOne({ user: req.user.id });
+  if (!account) {
+    return res.status(404).json({ message: "Account not found" });
+  }
+
+  if (account.balance < amount) {
+    return res.status(400).json({ message: "Insufficient balance" });
+  }
+
+  account.balance -= amount;
+  await account.save();
+
+  await Transaction.create({
+    user: req.user.id,
+    account: account._id,
+    type: "withdraw",
+    amount,
+    balanceAfter: account.balance,
+  });
+
+  res.json({
+    message: "Withdrawal successful",
+    balance: account.balance,
+  });
 };
+
 
 
 // 🔹 Transfer Money
