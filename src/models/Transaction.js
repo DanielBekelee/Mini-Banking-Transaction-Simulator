@@ -13,10 +13,11 @@ const transactionSchema = new mongoose.Schema(
       required: true,
     },
     type: {
-      type: String,
-      enum: ["deposit", "withdraw"],
-      required: true,
-    },
+  type: String,
+  enum: ["deposit", "withdraw", "transfer-in", "transfer-out"],
+  required: true,
+},
+
     amount: {
       type: Number,
       required: true,
