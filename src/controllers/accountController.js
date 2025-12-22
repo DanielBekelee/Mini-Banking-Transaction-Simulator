@@ -48,6 +48,13 @@ export const withdrawMoney = async (req, res) => {
   if (account.balance < amount) {
     return res.status(400).json({ message: "Insufficient balance" });
   }
+  
+if (amount > account.dailyLimit) {
+  return res.status(400).json({ message: `Amount exceeds daily limit of ${account.dailyLimit}` });
+}
+
+
+
 
   account.balance -= amount;
   await account.save();
@@ -122,3 +129,23 @@ export const transferMoney = async (req, res) => {
   }
 };
 
+// Create new account
+export const createBankAccount = async (req, res) => {
+  try {
+    const { accountType, initialBalance } = req.body;
+
+    const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000); // random 10-digit number
+
+    const account = await BankAccount.create({
+      user: req.user._id,
+      accountNumber,
+      accountType, // ✅ save account type
+      balance: initialBalance || 0,
+    });
+
+    res.status(201).json({ message: "Account created successfully", account });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
