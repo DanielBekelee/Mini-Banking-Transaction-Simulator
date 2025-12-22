@@ -1,10 +1,10 @@
 import express from "express";
 import { protect, isAdmin } from "../middleware/authMiddleware.js"; // named imports
-import { getAllUsers, getAllAccounts } from "../controllers/adminController.js";
+import { getAllUsers, getAllAccounts,getAnalytics } from "../controllers/adminController.js";
 
 const router = express.Router();
 
 router.get("/users", protect, isAdmin, getAllUsers);
 router.get("/accounts", protect, isAdmin, getAllAccounts);
-
+router.get("/analytics", protect, isAdmin, getAnalytics);
 export default router;
