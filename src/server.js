@@ -14,7 +14,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes); // attach auth routes
 app.use("/api/accounts", accountRoutes);
