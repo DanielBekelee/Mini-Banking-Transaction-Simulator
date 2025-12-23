@@ -1,6 +1,25 @@
 import BankAccount from "../models/BankAccount.js";
 import Transaction from "../models/Transaction.js";
 
+// 🔹 Get My Account Details
+export const getMyAccount = async (req, res) => {
+  try {
+    const account = await BankAccount.findOne({ user: req.user._id });
+
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    res.json({
+      accountNumber: account.accountNumber,
+      balance: account.balance,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 // 🔹 Deposit Money
 export const depositMoney = async (req, res) => {
   const { amount } = req.body;
