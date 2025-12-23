@@ -1,51 +1,39 @@
 import { useState } from "react";
 import api from "../api/axios";
+import Layout from "./Layout";
 
-function Deposit({ onSuccess }) {
+export default function Deposit() {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const handleDeposit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
-
     try {
-      const res = await api.post("/accounts/deposit", {
-        amount: Number(amount),
-      });
-
-      setMessage("Deposit successful");
+      const res = await api.post("/accounts/deposit", { amount: Number(amount) });
+      setMessage(`Deposit successful! New Balance: ${res.data.balance}`);
       setAmount("");
-
-      if (onSuccess) {
-        onSuccess(res.data.balance);
-      }
     } catch (err) {
-      setError(err.response?.data?.message || "Deposit failed");
+      setMessage(err.response?.data?.message || "Deposit failed");
     }
   };
 
   return (
-    <div>
-      <h3>Deposit Money</h3>
-
-      <form onSubmit={handleDeposit}>
+    <Layout>
+      <h2>Deposit Money</h2>
+      <form onSubmit={handleDeposit} style={{ maxWidth: "400px", margin: "20px 0" }}>
         <input
           type="number"
-          placeholder="Enter amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          placeholder="Amount"
           required
+          style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "5px" }}
         />
-        <button type="submit">Deposit</button>
+        <button type="submit" style={{ padding: "10px 20px", background: "#4e73df", color: "white", border: "none", borderRadius: "5px" }}>
+          Deposit
+        </button>
       </form>
-
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
+      {message && <p>{message}</p>}
+    </Layout>
   );
 }
-
-export default Deposit;

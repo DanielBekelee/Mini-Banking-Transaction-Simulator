@@ -3,6 +3,7 @@ import api from "../api/axios";
 import Deposit from "../components/Deposit";
 import Withdraw from "../components/Withdraw";
 import Transfer from "../components/Transfer";
+import TransactionHistory from "../components/TransactionHistory";
 
 
 function Dashboard() {
@@ -39,6 +40,8 @@ function Dashboard() {
 <Withdraw onSuccess={fetchAccount} />
 <hr />
 <Transfer onSuccess={fetchAccount} />
+<hr />
+<TransactionHistory />
 
 
     </div>
