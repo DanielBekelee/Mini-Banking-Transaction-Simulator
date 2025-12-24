@@ -1,36 +1,66 @@
 import { useState } from "react";
 import api from "../api/axios";
-import Layout from "./Layout";
+import PageCard from "./PageCard";
 
 export default function Transfer() {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [fromAccount, setFromAccount] = useState("");
+  const [toAccount, setToAccount] = useState("");
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
 
   const handleTransfer = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/transfer", { fromAccount: from, toAccount: to, amount: Number(amount) });
-      setMessage(`Transfer successful! Sender Balance: ${res.data.senderBalance}`);
-      setFrom(""); setTo(""); setAmount("");
+      const res = await api.post("/accounts/transfer", {
+        fromAccount,
+        toAccount,
+        amount,
+      });
+      setMessage(res.data.message || "Transfer successful");
+      setAmount("");
+      setFromAccount("");
+      setToAccount("");
     } catch (err) {
       setMessage(err.response?.data?.message || "Transfer failed");
     }
   };
 
   return (
-    <Layout>
-      <h2>Transfer Money</h2>
-      <form onSubmit={handleTransfer} style={{ maxWidth: "400px", margin: "20px 0" }}>
-        <input type="text" value={from} onChange={(e) => setFrom(e.target.value)} placeholder="From Account" required style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "5px" }} />
-        <input type="text" value={to} onChange={(e) => setTo(e.target.value)} placeholder="To Account" required style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "5px" }} />
-        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount" required style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "5px" }} />
-        <button type="submit" style={{ padding: "10px 20px", background: "#f6c23e", color: "white", border: "none", borderRadius: "5px" }}>
+    <PageCard title="Transfer Money">
+      <form onSubmit={handleTransfer} className="space-y-4">
+        <input
+          placeholder="From Account Number"
+          value={fromAccount}
+          onChange={(e) => setFromAccount(e.target.value)}
+          className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+
+        <input
+          placeholder="To Account Number"
+          value={toAccount}
+          onChange={(e) => setToAccount(e.target.value)}
+          className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+
+        <input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+
+        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
           Transfer
         </button>
+
+        {message && (
+          <p className="text-center text-sm text-gray-700 mt-3">{message}</p>
+        )}
       </form>
-      {message && <p>{message}</p>}
-    </Layout>
+    </PageCard>
   );
 }

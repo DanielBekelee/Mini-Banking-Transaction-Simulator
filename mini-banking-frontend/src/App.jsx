@@ -5,63 +5,83 @@ import Withdraw from "./components/Withdraw";
 import Transfer from "./components/Transfer";
 import Transactions from "./components/TransactionHistory";
 import AdminDashboard from "./components/AdminDashboard";
-import Layout from "./components/Layout";
-import Login from "./pages/Login"; // you can create simple login page
-import api from "./api/axios";
+import Login from "./pages/Login";
 import { jwtDecode } from "jwt-decode";
-
 
 function App() {
   const [user, setUser] = useState(null);
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    const decoded = jwtDecode(token);
-    setUser({
-      token,
-      role: decoded.role,
-      id: decoded.id,
-    });
-  }
-}, []);
-
+  // Load user from token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser({
+          token,
+          role: decoded.role,
+          id: decoded.id,
+        });
+      } catch (err) {
+        localStorage.removeItem("token");
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
   };
 
   return (
     <Router>
-      <Layout>
-        <nav style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-          {user ? (
-            <>
-              <Link to="/deposit">Deposit</Link>
-              <Link to="/withdraw">Withdraw</Link>
-              <Link to="/transfer">Transfer</Link>
-              <Link to="/transactions">Transactions</Link>
-              {user.role === "admin" && <Link to="/admin">Admin</Link>}
-              <button onClick={handleLogout} style={{ marginLeft: "auto" }}>Logout</button>
-            </>
-          ) : (
-            <Link to="/login">Login</Link>
-          )}
-        </nav>
+      {/* NAVBAR */}
+      <nav className="bg-gray-900 text-white px-6 py-4 flex gap-6 items-center">
+        <h1 className="font-bold text-lg">Mini Banking</h1>
 
-        <Routes>
-          <Route path="/" element={<Navigate to={user ? "/deposit" : "/login"} />} />
-          <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="/deposit" element={user ? <Deposit /> : <Navigate to="/login" />} />
-          <Route path="/withdraw" element={user ? <Withdraw /> : <Navigate to="/login" />} />
-          <Route path="/transfer" element={user ? <Transfer /> : <Navigate to="/login" />} />
-          <Route path="/transactions" element={user ? <Transactions /> : <Navigate to="/login" />} />
-          <Route path="/admin" element={user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" />} />
-       
+        {user && (
+          <>
+            <Link to="/deposit" className="hover:text-blue-400">Deposit</Link>
+            <Link to="/withdraw" className="hover:text-blue-400">Withdraw</Link>
+            <Link to="/transfer" className="hover:text-blue-400">Transfer</Link>
+            <Link to="/transactions" className="hover:text-blue-400">Transactions</Link>
 
-        </Routes>
-      </Layout>
+            {user.role === "admin" && (
+              <Link to="/admin" className="hover:text-yellow-400">Admin</Link>
+            )}
+
+            <button
+              onClick={handleLogout}
+              className="ml-auto bg-red-500 px-4 py-1 rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </>
+        )}
+
+        {!user && (
+          <Link to="/login" className="ml-auto hover:text-blue-400">
+            Login
+          </Link>
+        )}
+      </nav>
+
+      {/* ROUTES */}
+      <Routes>
+        <Route path="/" element={<Navigate to={user ? "/deposit" : "/login"} />} />
+
+        <Route path="/login" element={<Login setUser={setUser} />} />
+
+        <Route path="/deposit" element={user ? <Deposit /> : <Navigate to="/login" />} />
+        <Route path="/withdraw" element={user ? <Withdraw /> : <Navigate to="/login" />} />
+        <Route path="/transfer" element={user ? <Transfer /> : <Navigate to="/login" />} />
+        <Route path="/transactions" element={user ? <Transactions /> : <Navigate to="/login" />} />
+
+        <Route
+          path="/admin"
+          element={user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" />}
+        />
+      </Routes>
     </Router>
   );
 }
