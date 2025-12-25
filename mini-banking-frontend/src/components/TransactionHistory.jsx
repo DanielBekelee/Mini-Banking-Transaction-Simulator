@@ -11,7 +11,7 @@ export default function Transactions() {
       try {
         const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-        const res = await api.get("/transactionHistory", {
+        const res = await api.get("/transactions/history", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

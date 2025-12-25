@@ -6,6 +6,8 @@ import Transfer from "./components/Transfer";
 import Transactions from "./components/TransactionHistory";
 import AdminDashboard from "./components/AdminDashboard";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -60,17 +62,19 @@ function App() {
         )}
 
         {!user && (
-          <Link to="/login" className="ml-auto hover:text-blue-400">
-            Login
-          </Link>
+          <>
+            <Link to="/login" className="ml-auto hover:text-blue-400">Login</Link>
+            <Link to="/register" className="ml-4 hover:text-green-400">Register</Link>
+          </>
         )}
       </nav>
 
       {/* ROUTES */}
       <Routes>
-        <Route path="/" element={<Navigate to={user ? "/deposit" : "/login"} />} />
+        <Route path="/" element={<Home />} />
 
-        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/login" element={user ? <Navigate to="/deposit" /> : <Login setUser={setUser} />} />
+        <Route path="/register" element={user ? <Navigate to="/deposit" /> : <Register />} />
 
         <Route path="/deposit" element={user ? <Deposit /> : <Navigate to="/login" />} />
         <Route path="/withdraw" element={user ? <Withdraw /> : <Navigate to="/login" />} />
