@@ -13,6 +13,7 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
 import cors from "cors";
 import User from "./models/User.js"; // ✅ REQUIRED
+import aiRoutes from "./routes/aiRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -33,6 +34,7 @@ app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/transfer", transferRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/ai", aiRoutes);
 
 // 🔍 Debug / test route
 app.get("/api/users-with-accounts", async (req, res) => {
